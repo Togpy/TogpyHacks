@@ -30,6 +30,6 @@ UserInputService.InputBegan:Connect(function(input, gameProcessed)
 end)
 
 -- Add a toggle button to the UI to enable/disable teleporting forward
-Section:NewToggle("Teleport Forward on F", "Toggle to enable teleporting forward when F is pressed", function(state)
+Section:NewToggle("CTP", "Toggle to enable teleporting forward when F is pressed", function(state)
     teleportEnabled = state
 end)
