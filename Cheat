@@ -1,0 +1,35 @@
+-- Load the Kavo UI Library
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/xHeptc/Kavo-UI-Library/main/source.lua"))()
+local Window = Library.CreateLib("TogpyHacks", "GrapeTheme")
+local Tab = Window:NewTab("Free")
+local Section = Tab:NewSection("Free")
+
+-- Get the local player
+local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+
+-- Variable to track whether teleport is enabled
+local teleportEnabled = false
+
+-- Function to teleport the player forward
+local function teleportForward()
+    if teleportEnabled then
+        local forwardDirection = humanoidRootPart.CFrame.lookVector
+        local newPosition = humanoidRootPart.Position + forwardDirection * 10 -- Change the multiplier to adjust the teleport distance
+        humanoidRootPart.CFrame = CFrame.new(newPosition)
+    end
+end
+
+-- Detect when the "F" key is pressed
+local UserInputService = game:GetService("UserInputService")
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+    if not gameProcessed and input.KeyCode == Enum.KeyCode.F then
+        teleportForward()
+    end
+end)
+
+-- Add a toggle button to the UI to enable/disable teleporting forward
+Section:NewToggle("Teleport Forward on F", "Toggle to enable teleporting forward when F is pressed", function(state)
+    teleportEnabled = state
+end)
