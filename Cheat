@@ -8,28 +8,36 @@ local Section = Tab:NewSection("Free")
 local player = game.Players.LocalPlayer
 local character = player.Character or player.CharacterAdded:Wait()
 local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+local rightHand = character:WaitForChild("RightHand") -- Assuming RightHand is the part where you want the ball to teleport to
 
--- Variable to track whether teleport is enabled
-local teleportEnabled = false
+-- Variable to track whether teleporting football is enabled
+local ballTeleportEnabled = false
+local ballTeleportDistance = 20 -- Distance to trigger ball teleport
 
--- Function to teleport the player forward
-local function teleportForward()
-    if teleportEnabled then
-        local forwardDirection = humanoidRootPart.CFrame.lookVector
-        local newPosition = humanoidRootPart.Position + forwardDirection * 10 -- Change the multiplier to adjust the teleport distance
-        humanoidRootPart.CFrame = CFrame.new(newPosition)
+-- Function to teleport the football to the player's hands
+local function teleportFootballToPlayer()
+    if not ballTeleportEnabled then return end
+
+    local football = game.Workspace:FindFirstChild("Football") -- Change this to the name of the football in your game
+    if football and (football.Position - humanoidRootPart.Position).Magnitude <= ballTeleportDistance then
+        -- Teleport the ball to the right hand position
+        football.CFrame = rightHand.CFrame * CFrame.new(0, 0, -2) -- Adjust offset to ensure it appears in the hands
     end
 end
 
--- Detect when the "F" key is pressed
-local UserInputService = game:GetService("UserInputService")
-UserInputService.InputBegan:Connect(function(input, gameProcessed)
-    if not gameProcessed and input.KeyCode == Enum.KeyCode.F then
-        teleportForward()
-    end
+-- Add a toggle button to the UI to enable/disable teleporting the football to the player
+Section:NewToggle("Teleport Football to Hands", "Toggle to teleport the football to your hands when it is near", function(state)
+    ballTeleportEnabled = state
 end)
 
--- Add a toggle button to the UI to enable/disable teleporting forward
-Section:NewToggle("CTP", "Toggle to enable teleporting forward when F is pressed", function(state)
-    teleportEnabled = state
+-- Check for nearby football and perform actions periodically
+game:GetService("RunService").Heartbeat:Connect(function()
+    teleportFootballToPlayer()
+end)
+
+-- Reset the character and teleport state when the character respawns
+player.CharacterAdded:Connect(function(newCharacter)
+    character = newCharacter
+    humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+    rightHand = character:WaitForChild("RightHand") -- Ensure RightHand is referenced correctly
 end)
